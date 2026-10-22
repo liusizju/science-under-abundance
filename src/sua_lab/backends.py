@@ -9,27 +9,33 @@ class Backend(Protocol):
 
 @dataclass
 class MockBackend:
-    """Deterministic backend used for unit tests and plumbing demonstrations."""
-    name: str = "deterministic-mock-v1"
+    """Deterministic backend for plumbing tests only.
+
+    The mock deliberately does not condition its semantic output on the treatment
+    parameters. It is used to verify logging, parsing, and simulation mechanics;
+    it is not evidence for idea convergence or any behavioral prediction.
+    """
+    name: str = "deterministic-mock-v2"
 
     def generate(self, prompt: str, *, seed: int | None = None) -> str:
         rng = random.Random(seed or 0)
-        high_ai = any(tag in prompt for tag in ["0.80", "0.81", "0.82", "0.83", "0.84", "0.85", "0.86", "0.87", "0.88", "0.89", "0.90", "0.91", "0.92", "0.93", "0.94", "0.95", "0.96", "0.97", "0.98", "0.99", "1.00"])
-        mechanisms = (["verification scarcity", "priority racing", "evaluation breadth"] if high_ai else [
+        concepts = [
             "relative performance", "verification scarcity", "priority racing",
-            "attention allocation", "evaluation breadth", "review congestion"
-        ])
-        outcomes = (["verification effort", "idea overlap", "workload"] if high_ai else [
-            "workload", "idea overlap", "verification effort", "desk screening",
-            "resubmission", "knowledge diversity"
-        ])
-        m1, m2 = rng.sample(mechanisms, 2)
+            "attention allocation", "evaluation breadth", "review congestion",
+            "professional judgment", "exploration", "algorithmic homogenization",
+            "expert screening", "career incentives", "knowledge diversity"
+        ]
+        outcomes = [
+            "workload", "verification effort", "idea diversity", "project selection",
+            "review burden", "resubmission", "novelty", "quality", "abandonment"
+        ]
+        m1, m2 = rng.sample(concepts, 2)
         out = rng.choice(outcomes)
         return json.dumps({
-            "question": f"How does {m1} interact with {m2} to shape {out}?",
-            "mechanism": f"{m1} changes incentives while {m2} constrains adjustment.",
+            "question": f"When does {m1} change how {m2} shapes {out}?",
+            "mechanism": f"The proposed mechanism links {m1} to {m2} through a change in incentives or scarce attention.",
             "keywords": [m1, m2, out],
-            "verification_plan": "Check assumptions, competing mechanisms, and one falsifying case."
+            "verification_plan": "State a competing mechanism, identify one falsifying pattern, and specify what evidence would discriminate between them."
         })
 
 @dataclass
