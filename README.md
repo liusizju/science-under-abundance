@@ -1,38 +1,47 @@
-# Science Under Abundance (SUA) Lab — Stage-1 Prototype
+# Science Under Abundance (SUA) Lab
 
-SUA Lab is a small, reusable multi-agent research sandbox for studying how AI-enabled research generation interacts with human verification, scientific priority, and scarce editorial/reviewer capacity.
+SUA Lab is an early research prototype for a simple question: **what happens to a knowledge system when producing candidate work becomes cheap before the capacity to verify and evaluate it scales?**
 
-This repository is a **proof of concept**, not a behavioral model of scientists. Its purpose is to make theoretical mechanisms inspectable and experimentally manipulable. The Stage-1 package includes a deterministic backend for reproducible smoke tests and adapters for locally accessible LLM infrastructure.
+The scientific setting is useful because the bottleneck is visible. AI can help generate questions, code, analyses, and prose quickly, while researchers, editors, and reviewers still have finite attention. SUA Lab turns that mismatch into an experimental object. It lets researchers vary the production technology and the institutions around it in the same environment.
 
-## What the prototype does
+This is deliberately a prototype rather than a synthetic claim about how scientists behave.
 
-A run creates a synthetic scientific field with:
+## What is implemented now
 
-- **Researcher agents** that generate project ideas, choose a portfolio size, allocate verification effort, and decide when to submit.
-- **Editor/reviewer capacity** that screens submissions and creates congestion when manuscript traffic grows.
-- **Institutional reward regimes** that can emphasize quantity, best-K output, or scientific priority.
-- **Metrics** for project volume, idea overlap, verification per project, desk rejection, external-review load, and resubmission traffic.
+The Stage-1 repository contains:
 
-The current prototype is designed around three experiments:
+- LLM-backed generation of structured research ideas and verification plans;
+- transparent theory-harness rules for portfolio size, scarce verification, priority pressure, desk screening, and bounded resubmission;
+- experiment configurations for broad output incentives and best-K evaluation;
+- adapters for a deterministic plumbing test, local Ollama models, and OpenAI-compatible endpoints;
+- run-level logging of configuration, prompts, raw responses, parsed records, and derived metrics;
+- a synthetic, redistributable seed corpus;
+- smoke tests that verify the pipeline without treating mock outputs as scientific findings.
 
-1. **Generation and convergence** — does common AI assistance expand idea volume while increasing overlap?
-2. **Quantity vs. best-K evaluation** — do broad output incentives amplify project proliferation and verification dilution?
-3. **Publication bottleneck** — can stricter desk screening protect reviewers while shifting work into resubmission?
+LLM-based editor and reviewer agents, human validation, and cross-model benchmark runs are **Stage-2 work**, not completed Stage-1 features.
 
-## Quick start (deterministic smoke test)
+## Three questions for the lab
+
+1. **Abundance and convergence.** Can AI increase the number of plausible ideas while making independent search paths more correlated?
+2. **Evaluation and verification.** Does broad output-based evaluation convert AI productivity into more projects and thinner scrutiny, while best-K evaluation changes that allocation?
+3. **Where to intervene.** When manuscript generation outruns expert review, is the better response to screen harder downstream or to change incentives upstream?
+
+See [`EXPERIMENTS.md`](EXPERIMENTS.md) for planned tests and explicit falsification patterns.
+
+## Quick start: deterministic plumbing test
 
 ```bash
 python scripts/run_demo.py
 ```
 
-Outputs are written to `sample_results/`.
+The deterministic backend is an engineering fixture. It does **not** encode an AI-induced semantic convergence effect and its outputs are not evidence for the substantive theory.
 
-## Live LLM mode
+## Live model mode
 
-### Ollama (recommended for reproducibility/accessibility)
+### Ollama
 
 ```bash
-python scripts/run_experiment.py --backend ollama --model llama3.1:8b --config configs/baseline.yaml
+python scripts/run_experiment.py --backend ollama --model llama3.1:8b --config configs/baseline.yaml --out sample_results/ollama_baseline
 ```
 
 ### OpenAI-compatible endpoint
@@ -40,24 +49,28 @@ python scripts/run_experiment.py --backend ollama --model llama3.1:8b --config c
 ```bash
 export SUA_BASE_URL="http://localhost:8000/v1"
 export SUA_API_KEY="optional"
-python scripts/run_experiment.py --backend openai-compatible --model your-model --config configs/baseline.yaml
+python scripts/run_experiment.py --backend openai-compatible --model your-model --config configs/baseline.yaml --out sample_results/compatible_baseline
 ```
 
-The project deliberately does not require one proprietary provider. All prompts, model identifiers, seeds, and raw responses are logged.
+### Run the configuration grid
+
+```bash
+python scripts/run_grid.py --backend mock
+```
+
+For substantive experiments, replace `mock` with an accessible live backend.
 
 ## Reproducibility
 
-Each run records configuration and random seed, backend and model identifier, prompt text, raw model response, parsed agent decision, and derived metrics.
+Each run writes the complete configuration, random seed, prompt, raw model response, parsed record, and summary metrics. See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md).
 
-For nondeterministic LLM backends, cached traces can be shared so downstream analyses can be reproduced exactly.
+## Boundaries
 
-## Important boundary
+LLM agents are computational probes, not estimates of human behavior. A failed replication across models or a mismatch with human judgments is scientifically informative. See [`BOUNDARIES.md`](BOUNDARIES.md).
 
-SUA Lab does **not** assume that LLM agents faithfully represent human researchers. The artifact is a theory-building and institutional-design laboratory. Human validation and cross-model robustness are part of the planned Stage-2 development.
+## Stage-1 proposal
 
-## Associated proposal
-
-Organization Science Special Issue: *AI-Enabled Frontiers in Organizational Science* (Stage-1 submission package, 2026).
+Prepared for the *Organization Science* special issue **AI-Enabled Frontiers in Organizational Science**.
 
 ## License
 
