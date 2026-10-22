@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use SUA Lab, please cite the associated Organization Science research artifact."
+title: "Science Under Abundance (SUA) Lab"
+type: software
+version: 0.1.0
+date-released: 2026-10-21
+license: MIT
+authors:
+  - family-names: "Liu"
+    given-names: "Si"
