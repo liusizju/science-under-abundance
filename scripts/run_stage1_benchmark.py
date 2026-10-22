@@ -56,7 +56,7 @@ def call(base_url, model, text, seed, timeout=240):
       'messages':[{'role':'user','content':text}],
       'temperature':0.35,
       'seed':seed,
-      'max_tokens':900,
+      'max_tokens':650,
       'response_format':{'type':'json_object'}
     }
     req=urllib.request.Request(base_url.rstrip('/')+'/chat/completions', data=json.dumps(payload).encode(), headers={'Content-Type':'application/json'})
