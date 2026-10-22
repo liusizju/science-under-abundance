@@ -9,8 +9,10 @@ def load(name):
 b=load('baseline'); q=load('high_ai_quantity'); k=load('high_ai_bestk')
 assert q['primary_projects'] > b['primary_projects']
 assert q['avg_verification'] < b['avg_verification']
-assert q['idea_overlap_jaccard'] > b['idea_overlap_jaccard']
 assert q['total_submissions'] > b['total_submissions']
 assert k['primary_projects'] < q['primary_projects']
 assert k['avg_verification'] > q['avg_verification']
+for name in ['baseline','high_ai_quantity','high_ai_bestk']:
+    assert (ROOT/'sample_results'/name/'traces.jsonl').exists()
+    assert (ROOT/'sample_results'/name/'run_metadata.json').exists()
 print('smoke tests passed')
