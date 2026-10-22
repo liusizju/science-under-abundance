@@ -1,0 +1,14 @@
+{
+  "backend": "deterministic-mock-v2",
+  "n_researchers": 8,
+  "primary_projects": 21,
+  "avg_projects_per_researcher": 2.625,
+  "avg_verification": 0.4718919446467978,
+  "avg_quality_proxy": 0.589577663170074,
+  "idea_overlap_jaccard": 0.4015905534708056,
+  "total_submissions": 23,
+  "desk_rejections": 3,
+  "external_reviews": 20,
+  "review_load_ratio": 1.4285714285714286,
+  "avg_attempts": 1.0952380952380953
+}
