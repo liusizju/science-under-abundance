@@ -60,6 +60,12 @@ python scripts/run_grid.py --backend mock
 
 For substantive experiments, replace `mock` with an accessible live backend.
 
+## Stage-1 live-model pilot
+
+A frozen 36-trajectory open-weight pilot has now been run with Qwen2.5-1.5B-Instruct and SmolLM2-1.7B-Instruct across three institutional regimes. The pilot produced 34 valid structured trajectories. Best-K evaluation reduced selected portfolio size in both model families; the priority-action and idea-convergence margins were mixed or uninformative at this scale. We treat that mixture as evidence that the lab can return null and model-specific patterns rather than as confirmatory evidence.
+
+See [`benchmark/stage1_quick_2026-10-22/`](benchmark/stage1_quick_2026-10-22/) for the frozen design, descriptive summary, workflow identifiers, and artifact digests. Raw prompts and responses are preserved in the GitHub Actions artifacts and the submission snapshot.
+
 ## Reproducibility
 
 Each run writes the complete configuration, random seed, prompt, raw model response, parsed record, and summary metrics. See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md).
