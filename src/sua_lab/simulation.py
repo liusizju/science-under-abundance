@@ -34,6 +34,8 @@ class Simulation:
         self.rng = random.Random(cfg.seed)
 
     def _portfolio_size(self, researcher: int) -> int:
+        # Stylized theory harness: cheaper production and quantity-sensitive
+        # evaluation expand the extensive margin; best-K dampens it.
         base = 1.2 + 1.8*self.cfg.ai_capability
         incentive = 1.0 + 1.4*self.cfg.quantity_weight
         if self.cfg.best_k is not None:
@@ -42,23 +44,28 @@ class Simulation:
         return max(1, int(round(base*incentive*noise)))
 
     def _verification(self, n: int, local_overlap: float) -> float:
+        # Verification falls only through the two mechanisms in the theory:
+        # attention dilution and priority compression. AI has no direct effect here.
         attention_dilution = 1.0 / (1.0 + 0.35*(n-1))
         priority_compression = 1.0 / (1.0 + self.cfg.priority_premium*(0.6+local_overlap))
-        ai_substitution = 1.0 / (1.0 + 0.35*self.cfg.ai_capability)
-        return max(0.05, attention_dilution*priority_compression*ai_substitution)
+        return max(0.05, attention_dilution*priority_compression)
 
     def run(self):
         projects: list[Project] = []
+        traces: list[dict] = []
         corpus_text = "\n".join(x["text"] for x in self.corpus)
         prior_questions: list[str] = []
         for r in range(self.cfg.n_researchers):
             n = self._portfolio_size(r)
             for p in range(n):
+                project_id = f"R{r+1}P{p+1}"
                 reward_rule = ("Only the best outputs count." if self.cfg.best_k is not None
                                else "More publishable outputs improve evaluated performance.")
                 priority_note = ("Being first is strongly rewarded." if self.cfg.priority_premium > .5
                                  else "Priority matters, but independent follow-on contributions retain value.")
-                raw = self.backend.generate(idea_prompt(corpus_text, reward_rule, priority_note, self.cfg.ai_capability), seed=self.cfg.seed+r*100+p)
+                prompt = idea_prompt(corpus_text, reward_rule, priority_note, self.cfg.ai_capability)
+                call_seed = self.cfg.seed+r*100+p
+                raw = self.backend.generate(prompt, seed=call_seed)
                 try:
                     obj = json.loads(raw)
                 except json.JSONDecodeError:
@@ -66,9 +73,20 @@ class Simulation:
                 overlap = pairwise_overlap(prior_questions + [obj["question"]]) if prior_questions else 0.0
                 v = self._verification(n, overlap)
                 quality = max(0.0, min(1.0, 0.35 + 0.55*v + self.rng.uniform(-0.08,0.08)))
-                pr = Project(r, f"R{r+1}P{p+1}", obj["question"], obj.get("mechanism",""), v, quality)
-                projects.append(pr); prior_questions.append(pr.question)
+                pr = Project(r, project_id, obj["question"], obj.get("mechanism",""), v, quality)
+                projects.append(pr)
+                prior_questions.append(pr.question)
+                traces.append({
+                    "researcher": r,
+                    "project_id": project_id,
+                    "seed": call_seed,
+                    "backend": getattr(self.backend, "name", self.backend.__class__.__name__),
+                    "prompt": prompt,
+                    "raw_response": raw,
+                    "parsed": obj,
+                })
 
+        # Publication layer: load-dependent desk screening and bounded resubmission.
         queue = list(projects)
         total_submissions = 0; external_reviews = 0; desk_rejections = 0
         while queue:
@@ -86,6 +104,7 @@ class Simulation:
 
         questions = [p.question for p in projects]
         summary = {
+            "backend": getattr(self.backend, "name", self.backend.__class__.__name__),
             "n_researchers": self.cfg.n_researchers,
             "primary_projects": len(projects),
             "avg_projects_per_researcher": len(projects)/self.cfg.n_researchers,
@@ -98,14 +117,19 @@ class Simulation:
             "review_load_ratio": external_reviews/max(1,self.cfg.review_capacity),
             "avg_attempts": mean([p.attempts for p in projects]),
         }
-        return projects, summary
+        return projects, summary, traces
 
 def load_corpus(path):
     return [json.loads(line) for line in Path(path).read_text(encoding="utf-8").splitlines() if line.strip()]
 
-def write_outputs(projects, summary, out_dir):
+def write_outputs(projects, summary, traces, out_dir, config=None):
     out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
     with (out/"projects.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(asdict(projects[0]).keys()))
         w.writeheader(); w.writerows(asdict(x) for x in projects)
     (out/"summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    with (out/"traces.jsonl").open("w", encoding="utf-8") as f:
+        for trace in traces:
+            f.write(json.dumps(trace, ensure_ascii=False) + "\n")
+    if config is not None:
+        (out/"run_metadata.json").write_text(json.dumps(asdict(config), indent=2), encoding="utf-8")
