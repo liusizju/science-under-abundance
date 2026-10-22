@@ -1,0 +1,1 @@
+{"model_label":"smollm2-1.7b","model_request":"smollm2-1.7b","n_seeds":2,"n_agents":3,"conditions":["quantity","best_k","high_priority"],"commit_sha":"da51fe69e6ddaacbd7f8cde57216d718c552e231","trajectory_count":18,"valid_count":16}
