@@ -14,7 +14,7 @@ conditions = {
 all_summaries = {}
 for name, cfg in conditions.items():
     sim = Simulation(cfg, MockBackend(), corpus)
-    projects, summary = sim.run()
-    write_outputs(projects, summary, ROOT / "sample_results" / name)
+    projects, summary, traces = sim.run()
+    write_outputs(projects, summary, traces, ROOT / "sample_results" / name, config=cfg)
     all_summaries[name] = summary
 print(json.dumps(all_summaries, indent=2))
