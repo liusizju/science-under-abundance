@@ -18,7 +18,7 @@ The Stage-1 repository contains:
 - a synthetic, redistributable seed corpus;
 - smoke tests that verify the pipeline without treating mock outputs as scientific findings.
 
-LLM-based editor and reviewer agents, human validation, and cross-model benchmark runs are **Stage-2 work**, not completed Stage-1 features.
+LLM-based editor and reviewer agents, human validation, embedding-based semantic measurement, and broader cross-model benchmarking are **Stage-2 work**. A frozen two-family live-model pilot is already included at Stage 1.
 
 ## Three questions for the lab
 
@@ -27,6 +27,18 @@ LLM-based editor and reviewer agents, human validation, and cross-model benchmar
 3. **Where to intervene.** When manuscript generation outruns expert review, is the better response to screen harder downstream or to change incentives upstream?
 
 See [`EXPERIMENTS.md`](EXPERIMENTS.md) for planned tests and explicit falsification patterns.
+
+## Reuse the lab for another mechanism
+
+The intended reuse path is deliberately simple:
+
+1. Fork the repository.
+2. Replace `data/seed_corpus.jsonl` with a new synthetic or shareable knowledge environment.
+3. Copy and edit a YAML file in `configs/` to define the institutional rule you want to vary.
+4. If your theory requires a different mechanism, replace the relevant harness function while leaving generation, logging, and measurement infrastructure unchanged.
+5. Run the same comparison across model families and preserve raw traces.
+
+A scholar does not need to adopt the current portfolio, priority, or publication assumptions to use the lab.
 
 ## Quick start: deterministic plumbing test
 
