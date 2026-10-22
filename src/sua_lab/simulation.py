@@ -63,7 +63,7 @@ class Simulation:
                                else "More publishable outputs improve evaluated performance.")
                 priority_note = ("Being first is strongly rewarded." if self.cfg.priority_premium > .5
                                  else "Priority matters, but independent follow-on contributions retain value.")
-                prompt = idea_prompt(corpus_text, reward_rule, priority_note, self.cfg.ai_capability)
+                prompt = idea_prompt(corpus_text, reward_rule, priority_note)
                 call_seed = self.cfg.seed+r*100+p
                 raw = self.backend.generate(prompt, seed=call_seed)
                 try:
