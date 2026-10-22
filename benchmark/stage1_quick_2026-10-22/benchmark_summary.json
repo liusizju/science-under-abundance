@@ -1,0 +1,15 @@
+{
+  "summaries": [
+    {"model":"qwen25-1.5b","condition":"best_k","n":6,"valid_rate":1.0,"mean_portfolio":2.1666666667,"mean_verification_per_project":47.2222222222,"idea_jaccard":0.1500304484,"submit_now_rate":0.8333333333,"verify_more_rate":0.1666666667,"reposition_rate":0.0,"abandon_rate":0.0,"mean_revised_verification":46.6666666667},
+    {"model":"qwen25-1.5b","condition":"high_priority","n":6,"valid_rate":1.0,"mean_portfolio":3.1666666667,"mean_verification_per_project":31.9444444444,"idea_jaccard":0.1294614289,"submit_now_rate":1.0,"verify_more_rate":0.0,"reposition_rate":0.0,"abandon_rate":0.0,"mean_revised_verification":45.0},
+    {"model":"qwen25-1.5b","condition":"quantity","n":6,"valid_rate":1.0,"mean_portfolio":2.8333333333,"mean_verification_per_project":37.5,"idea_jaccard":0.1352613224,"submit_now_rate":1.0,"verify_more_rate":0.0,"reposition_rate":0.0,"abandon_rate":0.0,"mean_revised_verification":45.0},
+    {"model":"smollm2-1.7b","condition":"best_k","n":6,"valid_rate":1.0,"mean_portfolio":1.8333333333,"mean_verification_per_project":58.3333333333,"idea_jaccard":0.1857673437,"submit_now_rate":1.0,"verify_more_rate":0.0,"reposition_rate":0.0,"abandon_rate":0.0,"mean_revised_verification":0.0},
+    {"model":"smollm2-1.7b","condition":"high_priority","n":5,"valid_rate":0.8333333333,"mean_portfolio":2.4,"mean_verification_per_project":45.0,"idea_jaccard":0.1316262934,"submit_now_rate":1.0,"verify_more_rate":0.0,"reposition_rate":0.0,"abandon_rate":0.0,"mean_revised_verification":0.0},
+    {"model":"smollm2-1.7b","condition":"quantity","n":5,"valid_rate":0.8333333333,"mean_portfolio":2.0,"mean_verification_per_project":50.0,"idea_jaccard":0.1829679658,"submit_now_rate":1.0,"verify_more_rate":0.0,"reposition_rate":0.0,"abandon_rate":0.0,"mean_revised_verification":0.0}
+  ],
+  "cross_family": [
+    {"condition":"best_k","cross_family_jaccard":0.1469468246},
+    {"condition":"high_priority","cross_family_jaccard":0.1154347199},
+    {"condition":"quantity","cross_family_jaccard":0.1431177537}
+  ]
+}
