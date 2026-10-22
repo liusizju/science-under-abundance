@@ -1,0 +1,10 @@
+seed: 20261021
+n_researchers: 8
+ai_capability: 0.45
+quantity_weight: 0.45
+priority_premium: 0.35
+review_capacity: 14
+best_k: null
+max_resubmissions: 2
+backend: mock
+model: deterministic-mock-v1
