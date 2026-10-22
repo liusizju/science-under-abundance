@@ -7,4 +7,4 @@ review_capacity: 14
 best_k: null
 max_resubmissions: 2
 backend: mock
-model: deterministic-mock-v1
+model: deterministic-mock-v2
