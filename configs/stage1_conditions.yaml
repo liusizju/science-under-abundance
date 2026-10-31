@@ -1,0 +1,14 @@
+# Institutional treatments for the Stage-1 live-model benchmark.
+# Edit these prompts to test a competing organizational mechanism.
+# The original frozen pilot remains reproducible at its recorded commit SHA.
+quantity:
+  evaluation: "Your performance is evaluated broadly: each additional publishable project can improve your standing."
+  priority: "Priority matters, but independently valuable follow-on work still receives meaningful credit."
+
+best_k:
+  evaluation: "Only your TWO strongest completed projects will count in evaluation. Extra projects beyond the best two carry no direct evaluation credit."
+  priority: "Priority matters, but independently valuable follow-on work still receives meaningful credit."
+
+high_priority:
+  evaluation: "Your performance is evaluated broadly: each additional publishable project can improve your standing."
+  priority: "Being first is strongly rewarded. If a competing team publishes a substantially similar result first, the career value of your project falls sharply."
