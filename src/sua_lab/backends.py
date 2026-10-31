@@ -1,42 +1,86 @@
+"""Model adapters for local and OpenAI-compatible inference servers."""
+
 from __future__ import annotations
-import json, os, random, urllib.request
+
+import json
+import os
+import random
 from dataclasses import dataclass
 from typing import Protocol
+from urllib.request import Request, urlopen
+
 
 class Backend(Protocol):
     name: str
-    def generate(self, prompt: str, *, seed: int | None = None) -> str: ...
+
+    def generate(self, prompt: str, *, seed: int | None = None) -> str:
+        ...
+
+
+def _post_json(url: str, payload: dict, headers: dict | None = None) -> dict:
+    request = Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json", **(headers or {})},
+    )
+    with urlopen(request, timeout=180) as response:
+        return json.loads(response.read().decode("utf-8"))
+
 
 @dataclass
 class MockBackend:
-    """Deterministic backend for plumbing tests only.
+    """Repeatable fixture for testing the pipeline, not researcher behavior."""
 
-    The mock deliberately does not condition its semantic output on the treatment
-    parameters. It is used to verify logging, parsing, and simulation mechanics;
-    it is not evidence for idea convergence or any behavioral prediction.
-    """
     name: str = "deterministic-mock-v2"
 
     def generate(self, prompt: str, *, seed: int | None = None) -> str:
-        rng = random.Random(seed or 0)
+        # Deliberately independent of prompt content and institutional treatment.
+        rng = random.Random(seed if seed is not None else 0)
         concepts = [
-            "relative performance", "verification scarcity", "priority racing",
-            "attention allocation", "evaluation breadth", "review congestion",
-            "professional judgment", "exploration", "algorithmic homogenization",
-            "expert screening", "career incentives", "knowledge diversity"
+            "relative performance",
+            "verification scarcity",
+            "priority racing",
+            "attention allocation",
+            "evaluation breadth",
+            "review congestion",
+            "professional judgment",
+            "exploration",
+            "algorithmic homogenization",
+            "expert screening",
+            "career incentives",
+            "knowledge diversity",
         ]
         outcomes = [
-            "workload", "verification effort", "idea diversity", "project selection",
-            "review burden", "resubmission", "novelty", "quality", "abandonment"
+            "workload",
+            "verification effort",
+            "idea diversity",
+            "project selection",
+            "review burden",
+            "resubmission",
+            "novelty",
+            "quality",
+            "abandonment",
         ]
-        m1, m2 = rng.sample(concepts, 2)
-        out = rng.choice(outcomes)
-        return json.dumps({
-            "question": f"When does {m1} change how {m2} shapes {out}?",
-            "mechanism": f"The proposed mechanism links {m1} to {m2} through a change in incentives or scarce attention.",
-            "keywords": [m1, m2, out],
-            "verification_plan": "State a competing mechanism, identify one falsifying pattern, and specify what evidence would discriminate between them."
-        })
+        first, second = rng.sample(concepts, 2)
+        outcome = rng.choice(outcomes)
+
+        return json.dumps(
+            {
+                "question": (
+                    f"When does {first} change how {second} shapes {outcome}?"
+                ),
+                "mechanism": (
+                    f"The proposed mechanism links {first} to {second} through "
+                    "a change in incentives or scarce attention."
+                ),
+                "keywords": [first, second, outcome],
+                "verification_plan": (
+                    "State a competing mechanism, identify one falsifying pattern, "
+                    "and specify what evidence would discriminate between them."
+                ),
+            }
+        )
+
 
 @dataclass
 class OllamaBackend:
@@ -45,19 +89,17 @@ class OllamaBackend:
     name: str = "ollama"
 
     def generate(self, prompt: str, *, seed: int | None = None) -> str:
-        body = json.dumps({
+        payload = {
             "model": self.model,
             "prompt": prompt,
             "stream": False,
-            "options": {"seed": seed} if seed is not None else {}
-        }).encode("utf-8")
-        req = urllib.request.Request(
-            f"{self.base_url.rstrip('/')}/api/generate",
-            data=body,
-            headers={"Content-Type": "application/json"},
+            "options": {"seed": seed} if seed is not None else {},
+        }
+        response = _post_json(
+            f"{self.base_url.rstrip('/')}/api/generate", payload
         )
-        with urllib.request.urlopen(req, timeout=180) as resp:
-            return json.loads(resp.read().decode("utf-8"))["response"]
+        return response["response"]
+
 
 @dataclass
 class OpenAICompatibleBackend:
@@ -74,27 +116,29 @@ class OpenAICompatibleBackend:
         }
         if seed is not None:
             payload["seed"] = seed
-        headers = {"Content-Type": "application/json"}
+
+        headers = {}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
-        req = urllib.request.Request(
-            f"{self.base_url.rstrip('/')}/chat/completions",
-            data=json.dumps(payload).encode("utf-8"), headers=headers,
-        )
-        with urllib.request.urlopen(req, timeout=180) as resp:
-            obj = json.loads(resp.read().decode("utf-8"))
-            return obj["choices"][0]["message"]["content"]
 
-def make_backend(kind: str, model: str):
-    kind = kind.lower()
-    if kind == "mock":
+        response = _post_json(
+            f"{self.base_url.rstrip('/')}/chat/completions",
+            payload,
+            headers=headers,
+        )
+        return response["choices"][0]["message"]["content"]
+
+
+def make_backend(kind: str, model: str) -> Backend:
+    normalized = kind.lower().replace("_", "-")
+    if normalized == "mock":
         return MockBackend()
-    if kind == "ollama":
+    if normalized == "ollama":
         return OllamaBackend(model=model)
-    if kind in {"openai-compatible", "openai_compatible"}:
+    if normalized == "openai-compatible":
         return OpenAICompatibleBackend(
             model=model,
             base_url=os.environ.get("SUA_BASE_URL", "http://localhost:8000/v1"),
             api_key=os.environ.get("SUA_API_KEY", ""),
         )
-    raise ValueError(f"Unknown backend: {kind}")
+    raise ValueError(f"Unsupported backend: {kind}")

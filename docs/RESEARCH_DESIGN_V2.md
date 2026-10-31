@@ -1,60 +1,37 @@
-# Stage-1 research design, V2 (Mei Yang revisions)
+# Research design: Science Under Abundance
 
-This document tracks the **research design represented by the revised proposal**. It is a research-facing guide to the artifact, not a substitute for the separately submitted four-page proposal.
+*October 2026 Stage-1 proposal, revised after feedback from Mei Yang.*
 
-## The question
+The scientific setting is a useful case of a broader organizational problem: technology reduces the cost of generating candidate work more rapidly than the cost of evaluating it.
 
-What changes when AI makes candidate research output cheap while human verification and editorial attention remain scarce?
+We study that gap by holding a synthetic knowledge environment fixed while varying evaluation rules, priority rewards, and editorial capacity. LLMs supply open-ended research proposals; a separate, inspectable simulation supplies portfolio and publication-system mechanisms. The two parts are deliberately distinguished.
 
-The organizational contribution is to **experimentally vary the institutions around researchers**, not to treat a synthetic LLM agent as a real scientist. Evaluation rules, priority rewards, and review capacity become treatments within a controlled synthetic information environment.
+## A testable comparison
 
-## A concrete comparison
+Give agents the same seed material and ask each to propose four questions, select a portfolio, allocate a fixed 100-point verification budget, and respond to a competing submission.
 
-Give two groups of researcher agents identical source material:
+Under **broad-output evaluation**, additional publishable projects may improve career standing. Under **best-two evaluation**, only the two strongest completed projects count. The experiment records which questions are retained, not just how many are produced.
 
-| Rule | Broad-output evaluation | Best-two evaluation |
-|---|---|---|
-| Career signal | Each additional publishable contribution can count | Only the two strongest finished contributions count |
-| Task | Generate four candidate ideas; select projects; allocate 100 verification points | Exactly the same task |
-| Main comparison | Portfolio size; which ideas are retained; verification-plan quality | Same outcomes, holding the source material fixed |
+The initial idea was that selective evaluation would dampen portfolio proliferation. An equally important alternative is that agents might select familiar, lower-risk topics when only a few outputs count. Both explanations should be evaluated, rather than declaring smaller portfolios a desirable result by definition.
 
-In the existing Stage-1 live protocol, each agent responds once with four candidate ideas, selected IDs, a proposed allocation of 100 points, and a response to a priority threat.
+## Three experimental lines
 
-**Do not equate the accounting identity `100 / number_of_projects` with verified quality.** Verification-plan specificity, falsification checks, and substantive robustness need independent assessment.
+**Idea overlap.** Compare shared versus heterogeneous model families and information sources. Measure overlap among candidate ideas and among retained ideas separately. Check lexical results against semantic comparisons and blinded expert assessments.
 
-## The three experiments
+**Evaluation and verification.** Compare broad-output with best-K assessment while varying priority rewards and verification demands. Inspect the *content* of checking and falsification plans. Because the initial budget is fixed at 100 points, allocations per project are not independent evidence of diligence.
 
-### A. Abundance and idea convergence
+**Publication capacity.** Pass candidate work through a stylized editorial layer. Compare increased review capacity or stricter screening against upstream changes in researcher evaluation. Account for resubmission work rather than observing a single journal's queue only.
 
-Manipulate common vs. heterogeneous model families, seed corpora, and genuine model capabilities. Measure candidate-question overlap, **selected-question overlap**, topic coverage, near-duplicate clusters, and blinded expert assessments. A purely lexical overlap statistic is diagnostic but not proof of scientific duplication.
+## What the first pilot provides
 
-Alternative: a stronger or more diverse model broadens the scientific search space rather than narrowing it.
+Two small open-weight model families completed a 36-trajectory pilot in October 2026, with 34 usable structured outputs. Best-two evaluation was associated with smaller portfolios in both models. Priority responses were near ceiling, while idea similarity was not uniform across models.
 
-### B. Quantity versus quality under reward rules
+These are feasibility observations. There is no evidence here about actual working hours, misconduct, or real publication outcomes. LLM-based editors and reviewers have not been built, and measures of research quality still require human validation.
 
-Manipulate broad-output versus best-K evaluation, verification requirements, and priority rewards. Measure project entry, project abandonment, content of verification plans, selected-idea novelty, and external quality judgments.
+The original pilot outputs, model identifiers, and run metadata remain frozen. Later exploratory reanalysis distinguishing candidate and retained ideas is kept separate from the original results.
 
-**Competing mechanism introduced in V2:** best-K can reduce project count but concentrate selected ideas in defensible, conventional areas. This would be a meaningful institutional trade-off: more scrutiny per retained project, but potentially less exploration. It remains a question for Stage 2, not an established pilot result.
+## What would change the interpretation?
 
-### C. Upstream incentives versus downstream filtering
+An evaluation rule that produces fewer projects but more concentrated research directions would reveal a different trade-off from the original workload story. A priority prompt that leads agents to abandon crowded topics would similarly challenge a pure racing mechanism. Results that disappear across models or after blind human review would indicate the limit of this synthetic approach.
 
-Route generated submissions through a capacity-constrained editorial model. Vary desk screening, reviewer capacity, resubmission probability, and upstream performance rules. Compare *system-wide* work and quality, not only the queue at a single journal.
-
-## What Stage 1 already establishes
-
-- An executable multi-stage **structured prompt protocol** on two small, independently developed open-weight model families.
-- A separate inspectable theory harness and a stylized publication simulation.
-- A frozen pilot of **36 trajectories; 34 parsable records**. Best-two evaluation reduced portfolio size in both model families; priority response had a ceiling effect, and lexical convergence was model-dependent.
-- Reproducibility metadata: prompts, raw responses, seeds, model identities, commit ID, and artifact digests.
-
-The pilot is a feasibility demonstration. It **does not estimate human researchers' responses** and does not establish scientific novelty or actual time spent verifying papers.
-
-## What is not yet built
-
-LLM editor/reviewer agents, semantic embeddings, calibrated verification quality, human blinded ratings, and a multi-family reference benchmark beyond the two-family pilot.
-
-## Source separation and public disclosure
-
-The research design here reflects the revised proposal, but the full unpublished DOCX/PDF is **not automatically posted** in this code repository. This allows the software artifact to become public without requiring the manuscript itself to be published early.
-
-The 22 October frozen pilot is identified by GitHub Actions run `39708296202`, historical workflow commit `da51fe69e6ddaacbd7f8cde57216d718c552e231`, and the SHA-256 values recorded in `benchmark/stage1_quick_2026-10-22/README.md`. Historical traces must never be overwritten to make the newer analysis look more favorable.
+A successful research instrument should make those counterexamples visible and reproducible, even when they weaken its initial theory.

@@ -1,5 +1,13 @@
+# Python artifacts
 __pycache__/
-*.pyc
-.env
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
 .venv/
+
+# Local inference settings and output
+.env
 live_runs/
+benchmark_runs/
+sample_results/*/
+.DS_Store
