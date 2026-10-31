@@ -27,9 +27,21 @@ def main():
  for r in valid:groups[(r['model_label'],r['condition'])].append(r)
  summaries=[]
  for (m,c),rs in sorted(groups.items()):
-  norms=[r['normalized'] for r in rs]; qs=[q for n in norms for q in n['questions'] if q]; acts=Counter(n['priority_action'] for n in norms)
+  norms=[r['normalized'] for r in rs]
+  qs=[q for n in norms for q in n['questions'] if q]
+  # Distinguish generated candidates from ideas actually retained by each agent.
+  # This matters for the V2 alternative: best-K may shift selection toward safer ideas
+  # even if the full candidate set does not become more homogeneous.
+  selected_qs=[
+    str(n['ideas'][i-1].get('question',''))
+    for n in norms
+    for i in n.get('selected_ids',[])
+    if isinstance(i,int) and 1<=i<=len(n.get('ideas',[]))
+    and isinstance(n['ideas'][i-1],dict)
+  ]
+  acts=Counter(n['priority_action'] for n in norms)
   denom=sum(1 for r in rows if r['model_label']==m and r['condition']==c)
-  summaries.append({'model':m,'condition':c,'n':len(rs),'valid_rate':len(rs)/denom if denom else 0,'mean_portfolio':mean([n['portfolio_size'] for n in norms]),'mean_verification_per_project':mean([n['verification_per_project'] for n in norms]),'idea_jaccard':pair(qs),'submit_now_rate':acts['submit_now']/len(norms),'verify_more_rate':acts['verify_more']/len(norms),'reposition_rate':acts['reposition']/len(norms),'abandon_rate':acts['abandon']/len(norms),'mean_revised_verification':mean([n['revised_verification'] for n in norms])})
+  summaries.append({'model':m,'condition':c,'n':len(rs),'valid_rate':len(rs)/denom if denom else 0,'mean_portfolio':mean([n['portfolio_size'] for n in norms]),'mean_verification_per_project':mean([n['verification_per_project'] for n in norms]),'idea_jaccard':pair(qs),'selected_idea_jaccard':pair(selected_qs),'submit_now_rate':acts['submit_now']/len(norms),'verify_more_rate':acts['verify_more']/len(norms),'reposition_rate':acts['reposition']/len(norms),'abandon_rate':acts['abandon']/len(norms),'mean_revised_verification':mean([n['revised_verification'] for n in norms])})
  cross=[]; models=sorted(set(r['model_label'] for r in valid))
  if len(models)>=2:
   for c in sorted(set(r['condition'] for r in valid)):
@@ -48,8 +60,8 @@ def main():
  if summaries:
   with (out/'benchmark_summary.csv').open('w',newline='',encoding='utf-8') as f:
    w=csv.DictWriter(f,fieldnames=list(summaries[0]));w.writeheader();w.writerows(summaries)
- lines=['# Stage-1 open-weight benchmark','',f'Total trajectories: {len(rows)}; valid structured trajectories: {len(valid)} ({len(valid)/len(rows):.1%}).' if rows else 'No trajectories.','', '## Cell summaries','', '| Model | Condition | n | Portfolio | Verification/project | Idea Jaccard | Submit now | Verify more |', '|---|---|---:|---:|---:|---:|---:|---:|']
- for x in summaries:lines.append(f"| {x['model']} | {x['condition']} | {x['n']} | {x['mean_portfolio']:.2f} | {x['mean_verification_per_project']:.1f} | {x['idea_jaccard']:.3f} | {x['submit_now_rate']:.2f} | {x['verify_more_rate']:.2f} |")
+ lines=['# Stage-1 open-weight benchmark','',f'Total trajectories: {len(rows)}; valid structured trajectories: {len(valid)} ({len(valid)/len(rows):.1%}).' if rows else 'No trajectories.','', '## Cell summaries','', '| Model | Condition | n | Portfolio | Verification/project | Candidate Jaccard | Selected Jaccard | Submit now | Verify more |', '|---|---|---:|---:|---:|---:|---:|---:|---:|']
+ for x in summaries:lines.append(f"| {x['model']} | {x['condition']} | {x['n']} | {x['mean_portfolio']:.2f} | {x['mean_verification_per_project']:.1f} | {x['idea_jaccard']:.3f} | {x['selected_idea_jaccard']:.3f} | {x['submit_now_rate']:.2f} | {x['verify_more_rate']:.2f} |")
  lines+=['','## Cross-family overlap','']+[f"- {x['condition']}: cross-family Jaccard = {x['cross_family_jaccard']:.3f}" for x in cross]
  lines+=['','## Pre-specified contrasts','']+[f"- {json.dumps(x)}" for x in contrasts]
  lines+=['','## Interpretation boundary','','These are small-model synthetic trajectories. They demonstrate that the artifact runs on real open-weight LLMs and can reveal institution- and model-dependent behavior. They are not estimates of human researcher behavior and are not confirmatory evidence for the theory.']
