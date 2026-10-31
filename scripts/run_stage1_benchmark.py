@@ -2,20 +2,23 @@ from __future__ import annotations
 import argparse, json, os, time, urllib.request
 from pathlib import Path
 
-CONDITIONS={
- 'quantity': {
-   'evaluation': 'Your performance is evaluated broadly: each additional publishable project can improve your standing.',
-   'priority': 'Priority matters, but independently valuable follow-on work still receives meaningful credit.'
- },
- 'best_k': {
-   'evaluation': 'Only your TWO strongest completed projects will count in evaluation. Extra projects beyond the best two carry no direct evaluation credit.',
-   'priority': 'Priority matters, but independently valuable follow-on work still receives meaningful credit.'
- },
- 'high_priority': {
-   'evaluation': 'Your performance is evaluated broadly: each additional publishable project can improve your standing.',
-   'priority': 'Being first is strongly rewarded. If a competing team publishes a substantially similar result first, the career value of your project falls sharply.'
- }
-}
+def load_conditions(path: str):
+    """Load actual institutional prompt treatments from an editable YAML file.
+
+    This applies to NEW experiments. The October 2026 pilot is frozen at its
+    historical commit and must not be retroactively overwritten.
+    """
+    try:
+        import yaml
+    except ImportError as exc:
+        raise SystemExit("Install PyYAML: pip install -r requirements.txt") from exc
+    data=yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(data,dict) or not data:
+        raise ValueError("Institutional conditions must be a nonempty mapping")
+    for name,condition in data.items():
+        if not isinstance(condition,dict) or not all(isinstance(condition.get(k),str) and condition.get(k).strip() for k in ("evaluation","priority")):
+            raise ValueError(f"Invalid institutional condition: {name}")
+    return data
 
 def load_corpus(path: Path):
     return [json.loads(x) for x in path.read_text(encoding='utf-8').splitlines() if x.strip()]
@@ -107,9 +110,10 @@ def main():
     p.add_argument('--model',required=True); p.add_argument('--model-label',required=True)
     p.add_argument('--n-seeds',type=int,default=3); p.add_argument('--n-agents',type=int,default=6)
     p.add_argument('--out',required=True); p.add_argument('--corpus',default='data/seed_corpus.jsonl')
+    p.add_argument('--conditions-file',default='configs/stage1_conditions.yaml')
     p.add_argument('--commit',default=os.environ.get('GITHUB_SHA','unknown'))
-    a=p.parse_args(); out=Path(a.out); out.mkdir(parents=True,exist_ok=True); corpus=load_corpus(Path(a.corpus)); traces=[]
-    for cond_name,cond in CONDITIONS.items():
+    a=p.parse_args(); out=Path(a.out); out.mkdir(parents=True,exist_ok=True); corpus=load_corpus(Path(a.corpus)); conditions=load_conditions(a.conditions_file); traces=[]
+    for cond_name,cond in conditions.items():
       for seed_ix in range(a.n_seeds):
        for agent in range(a.n_agents):
         seed=20261021+seed_ix*1000+agent; txt=build_prompt(corpus,cond); t=time.time()
@@ -120,7 +124,7 @@ def main():
         print(a.model_label,cond_name,seed_ix,agent,'OK' if norm else 'INVALID',round(time.time()-t,1),flush=True)
     with (out/'raw_traces.jsonl').open('w',encoding='utf-8') as f:
       for x in traces:f.write(json.dumps(x,ensure_ascii=False)+'\n')
-    manifest={'model_label':a.model_label,'model_request':a.model,'n_seeds':a.n_seeds,'n_agents':a.n_agents,'conditions':list(CONDITIONS),'commit_sha':a.commit,'trajectory_count':len(traces),'valid_count':sum(x['normalized'] is not None for x in traces)}
+    manifest={'model_label':a.model_label,'model_request':a.model,'n_seeds':a.n_seeds,'n_agents':a.n_agents,'conditions':list(conditions),'conditions_file':a.conditions_file,'commit_sha':a.commit,'trajectory_count':len(traces),'valid_count':sum(x['normalized'] is not None for x in traces)}
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
     print(json.dumps(manifest,indent=2))
 if __name__=='__main__':main()
