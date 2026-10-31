@@ -1,34 +1,30 @@
-# Interpretation boundaries
+# Interpretation limits
 
-SUA Lab makes **organizational rules around knowledge production experimentally manipulable**. It does not turn simulated LLM trajectories into evidence about real scientists.
+SUA Lab offers controlled comparisons between synthetic research environments. An LLM's choice in this environment is not a measurement of what an academic researcher would do.
 
-## Claims supported at Stage 1
+## What the prototype demonstrates
 
-- The prototype can generate open-ended research objects, select portfolios, allocate a stated budget, and respond to a priority prompt using different open-weight model families.
-- The implementation can vary evaluation rules around the same synthetic corpus, preserve raw traces, and analyze model-specific responses.
-- A preliminary 36-trajectory run exhibited smaller selected portfolios under best-two evaluation in both model families. Other patterns were ambiguous or at ceiling.
+- A live model can generate proposed research ideas, choose projects, allocate a stated budget, and respond to a priority prompt.
+- Those tasks can be repeated across evaluation conditions with the same seed material.
+- Prompts, raw responses, and analysis settings can be preserved for audit and reanalysis.
+- A small two-family pilot produced both directional and uninformative comparisons.
 
-## Claims NOT established
+## What remains unresolved
 
-- That real researchers increase total workload when AI improves;
-- that human verification quality improves under best-K;
-- that language similarity reliably measures scientific idea duplication;
-- that AI creates universally greater idea convergence or priority pressure;
-- that modeled desks and reviewers faithfully represent real editorial decisions;
-- that a particular tenure, promotion, or journal policy is socially optimal.
+The pilot does not show whether AI increases human workload, causes plagiarism, reduces real verification quality, or leads researchers to pursue less novel work. The editorial-capacity model is stylized and cannot identify the best actual tenure or journal policy.
 
-## A mechanical versus behavioral distinction
+Two measurement issues are especially important.
 
-When a participant must allocate exactly 100 points, `verification_per_project = 100/portfolio_size`. This number *must* rise as selected portfolio size falls, regardless of whether the agent is conscientious. Its direction cannot be counted as separate support for verification quality.
+**Verification budget.** The protocol requires agents to allocate 100 points. Accordingly, the mean allocation per retained project is always \`100 / n\`. A higher value after selecting fewer projects cannot independently support a claim about research quality. Assessing the substance of verification plans requires other measures.
 
-For the substantive claim we need content-based evaluation of how verification effort is *allocated and described*, and eventually blinded human ratings.
+**Idea similarity.** Shared vocabulary is not equivalent to the same contribution. Lexical overlap should be treated as a screening statistic until it is compared with semantic and blinded human judgments.
 
-## Competing theoretical explanation
+The original structured-output parser accepted some deviations from the instructions. The current runner records protocol warnings so these can be distinguished from parsing failures. We do not retroactively change the frozen October 2026 pilot.
 
-Best-two rewards might reduce marginal projects but also encourage a concentration on familiar, easily defended research. In that event fewer projects and greater attention per project could accompany **less intellectual exploration**. This is a motivating possibility from the revised Stage-1 proposal, not a finding already demonstrated.
+## Competing explanations
 
-## Why negative results matter
+Best-K evaluation could produce smaller portfolios while favoring conventional, easy-to-defend ideas. A priority threat could cause project abandonment instead of rushed submission. Different model families may respond in opposite directions.
 
-A model-specific effect, a failed human replication, or a prompt-induced reversal reveals where synthetic experimentation stops being informative. These are useful limits for a generalizable AI-enabled research instrument.
+These outcomes are relevant findings, not software failures. The purpose of the lab is to make such comparisons inspectable before drawing conclusions about real organizations.
 
-The synthetic seed corpus is designed for reuse. Never upload confidential manuscripts, reviewer reports, proposals, personal conversations, or unpublished ideas belonging to others into experiments without explicit appropriate authorization.
+All inputs are synthetic or shareable. Do not add confidential manuscripts, grant applications, reviews, or unpublished work belonging to others without the appropriate authorization.
