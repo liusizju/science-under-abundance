@@ -1,50 +1,41 @@
-# Experiments: what would the SUA Lab help us learn?
+# Experimental plan
 
-The Stage-1 study is a **synthetic research instrument**, not a field experiment on actual scientists. Institutional rules are manipulated while the knowledge environment is held fixed. The three experiments below also state plausible outcomes that would challenge the original theory.
+The central comparison is between the behavior of researcher agents under different institutional rules, holding their starting information constant. The following experiments are proposals for Stage 2; the frozen 36-trajectory pilot demonstrates feasibility, not the outcomes of these tests.
 
-## 1. Does a common AI system narrow scientific search?
+## 1. Idea generation and selection
 
-**Treatment:** common versus heterogeneous model families, different knowledge corpora, and actual capability differences (not merely a prompt saying "high AI").
+**Question.** Does using the same model make research trajectories more similar? Does an evaluation rule subsequently amplify or reduce that similarity?
 
-**Unit:** independent agent-generated research ideas under the same assignment.
+Vary model family, whether agents share a model or use different models, and the seed corpus. Count distinct ideas and measure overlap separately for all generated candidates and the subset chosen for development.
 
-**Outcomes:** number of viable candidates, pairwise semantic and lexical similarity, near-duplicate clusters, topical coverage, and blind ratings of conceptual novelty.
+The lexical Jaccard metric in the prototype is only a first diagnostic. Planned measures include embeddings, clustering, and blinded expert assessments of whether two ideas are substantively distinct.
 
-Measure **all candidate ideas** separately from **ideas the agent elects to pursue**. Choosing which idea survives may create convergence even when initial ideation is diverse.
+A stronger model or shared model could broaden search rather than narrow it. That outcome would challenge the proposed convergence mechanism.
 
-**Possible counterexample:** common-model assistance increases diversity or has no effect once output count is controlled.
+## 2. Evaluation breadth and research choices
 
-## 2. Does selective evaluation improve scrutiny at the expense of exploration?
+**Question.** Does limiting evaluation to a researcher's best outputs encourage deeper investigation, or does it steer project selection toward safer questions?
 
-**Treatment:** broad-output evaluation versus best-two / best-K evaluation; separately manipulate verification demands and priority premiums.
+Compare broad-output rewards with best-K evaluation, keeping the task and corpus the same. Record which ideas agents retain, which they abandon, and what checking and falsification activities their plans specify. Vary priority rewards independently.
 
-**Stage-1 task:** generate four questions from a fixed synthetic corpus, choose a portfolio, allocate 100 verification points, respond to a possible competitor submission. See `configs/stage1_conditions.yaml`.
+Because the initial protocol fixes a total budget of 100 verification points, more points per project follow automatically when fewer projects are retained. Verification *quality* must instead be assessed from the planned checks and, subsequently, by independent raters.
 
-**Outcomes:** selected portfolio size, idea abandonment, candidate-versus-selected idea overlap, *substantive* quality of verification plans, falsification strategies, blinded novelty and quality ratings.
+An important alternative is that best-K decreases project count while increasing concentration on familiar research topics. Smaller portfolios would then involve a trade-off with exploration rather than an unqualified improvement.
 
-A useful rival mechanism in the V2 proposal is that a best-K rule can lower portfolio size while **funneling researchers toward safe questions**, thereby reducing exploration. We should not treat "fewer projects" as unconditionally better.
+## 3. Research volume and editorial capacity
 
-**Measurement warning:** 100 points are required by the prompt. Average budget/project is therefore algebraically `100/n`. It cannot independently establish that more checking occurred, nor does it establish more reliable science.
+**Question.** When submissions grow, does stricter desk screening conserve scarce reviewer attention or mainly displace work into repeated submissions?
 
-**Possible counterexamples:** best-K leaves project selection unchanged, produces greater convergence, or reduces scrutiny of nonselected but scientifically valuable directions.
+Within the stylized publication environment, vary review capacity, editorial signal noise, desk thresholds, and resubmission behavior. Compare these changes with earlier interventions in researcher evaluation.
 
-## 3. Is stronger desk rejection preferable to upstream reform?
+The outcomes of interest are total submission attempts, external reviews, delayed decisions, erroneous rejections, and workload displaced across journals. The first version uses transparent screening equations; LLM editor and reviewer roles remain planned work.
 
-**Treatment:** reviewer capacity, desk threshold, noisy screening, resubmission probabilities, upstream publication rewards, and verification requirements.
+A finding that strict screening protects reviewer capacity with little resubmission burden would weaken the case for upstream incentive reform.
 
-**Outcomes:** primary projects and total submission attempts, editor/reviewer load, false negatives, resubmission displacement, and decision delay.
+## Evidence and safeguards
 
-The stylized publication queue is currently **coded as inspectable rules**; genuine LLM editor and reviewer roles are a future extension.
+Runs will retain prompts, raw responses, model details, seeds, and analysis parameters. The main comparisons should be checked across model families and prompt variants rather than interpreted from a single LLM.
 
-**Possible counterexample:** higher desk-rejection thresholds protect scarce reviewers at low total social cost, with negligible resubmission displacement.
+Human experts will evaluate selected idea pairs and verification plans without seeing the agents' treatment labels. We will report failed parses, protocol violations, null comparisons, and model-specific effects alongside successful runs.
 
-## Cross-cutting safeguards
-
-- Compare actual model families and prompt variants. Preserve negative results.
-- Pre-register measurement choices for the main study before interpreting semantic convergence.
-- Use both embeddings and blinded human judgments to validate idea similarity and scientific distinctiveness.
-- Validate the decision protocol itself: completion, violations of best-K rewards, allocation sums, and the share of generic or malformed outputs.
-- Do not use confidential manuscripts or real peer-review material.
-- Freeze complete prompts/responses and publish enough metadata for independent reruns, subject to model licensing.
-
-The October 2026 two-family pilot demonstrates that the workflow runs and can exhibit model-specific outcomes. Its 36 trajectories are not confirmatory evidence or population estimates.
+No confidential submissions, referee reports, or private research conversations are used as inputs.
