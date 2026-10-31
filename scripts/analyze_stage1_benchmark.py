@@ -193,8 +193,27 @@ def institutional_contrasts(summaries: list[dict]) -> list[dict]:
     return contrasts
 
 
+
+def completion_by_cell(records: list[dict]) -> list[dict]:
+    """Keep cells visible even when every model response is unusable."""
+    groups = defaultdict(list)
+    for record in records:
+        groups[(record["model_label"], record["condition"])].append(record)
+
+    return [
+        {
+            "model": model,
+            "condition": condition,
+            "attempted": len(group),
+            "usable": sum(record.get("normalized") is not None for record in group),
+            "invalid": sum(record.get("normalized") is None for record in group),
+        }
+        for (model, condition), group in sorted(groups.items())
+    ]
+
 def write_report(output: Path, records: list[dict], results: dict) -> None:
     summaries = results["summaries"]
+    coverage = results["completion_by_cell"]
     usable = sum(record.get("normalized") is not None for record in records)
     total = len(records)
     lines = [
@@ -202,6 +221,18 @@ def write_report(output: Path, records: list[dict], results: dict) -> None:
         "",
         f"Trajectories: {total}; structurally usable: {usable}"
         + (f" ({usable / total:.1%})." if total else "."),
+        "",
+        "## Structured-output coverage",
+        "",
+        "| Model | Condition | Attempted | Usable | Invalid |",
+        "|---|---|---:|---:|---:|",
+    ]
+    for row in coverage:
+        lines.append(
+            f"| {row['model']} | {row['condition']} | {row['attempted']} "
+            f"| {row['usable']} | {row['invalid']} |"
+        )
+    lines.extend([
         "",
         "## Results by model and institutional condition",
         "",
@@ -248,6 +279,7 @@ def main() -> None:
 
     results = {
         "summaries": summarize_cells(records),
+        "completion_by_cell": completion_by_cell(records),
         "cross_family": compare_families(records),
         "contrasts": [],
     }
