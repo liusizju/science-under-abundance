@@ -1,41 +1,50 @@
-# Experimental agenda
+# Experiments: what would the SUA Lab help us learn?
 
-SUA Lab is meant to make the institutions around AI-enabled knowledge production experimentally manipulable. The experiments below are the Stage-2 agenda, not claims already established by the Stage-1 smoke test.
+The Stage-1 study is a **synthetic research instrument**, not a field experiment on actual scientists. Institutional rules are manipulated while the knowledge environment is held fixed. The three experiments below also state plausible outcomes that would challenge the original theory.
 
-## 1. Abundance and convergence
+## 1. Does a common AI system narrow scientific search?
 
-**Question.** Does AI assistance expand the number of plausible research directions while also making independent search paths more similar?
+**Treatment:** common versus heterogeneous model families, different knowledge corpora, and actual capability differences (not merely a prompt saying "high AI").
 
-**Manipulations.** Common vs. heterogeneous model families; common vs. heterogeneous seed corpora; model capability.
+**Unit:** independent agent-generated research ideas under the same assignment.
 
-**Primary outcomes.** Number of viable ideas; semantic similarity; topical coverage; near-duplicate clusters; blinded novelty ratings.
+**Outcomes:** number of viable candidates, pairwise semantic and lexical similarity, near-duplicate clusters, topical coverage, and blind ratings of conceptual novelty.
 
-**Evidence against the mechanism.** If common-model assistance does not raise overlap relative to heterogeneous-model assistance after controlling for output volume, the idea-convergence channel is weakened. If stronger models expand coverage rather than concentrate it, the theory should be revised rather than re-labeled as support.
+Measure **all candidate ideas** separately from **ideas the agent elects to pursue**. Choosing which idea survives may create convergence even when initial ideation is diverse.
 
-## 2. Evaluation rules and verification
+**Possible counterexample:** common-model assistance increases diversity or has no effect once output count is controlled.
 
-**Question.** Do broad output rewards turn AI productivity into project proliferation, while selective evaluation shifts attention back toward fewer projects?
+## 2. Does selective evaluation improve scrutiny at the expense of exploration?
 
-**Manipulations.** Output-count reward vs. best-K reward; verification requirement; priority premium.
+**Treatment:** broad-output evaluation versus best-two / best-K evaluation; separately manipulate verification demands and priority premiums.
 
-**Primary outcomes.** Portfolio size; verification-plan depth; project abandonment; time-to-submit proxy; quality and distinctiveness ratings.
+**Stage-1 task:** generate four questions from a fixed synthetic corpus, choose a portfolio, allocate 100 verification points, respond to a possible competitor submission. See `configs/stage1_conditions.yaml`.
 
-**Evidence against the mechanism.** If evaluation breadth does not change project entry or verification under the same AI environment, the institutional channel is not doing the work the theory assigns to it.
+**Outcomes:** selected portfolio size, idea abandonment, candidate-versus-selected idea overlap, *substantive* quality of verification plans, falsification strategies, blinded novelty and quality ratings.
 
-## 3. Where should the system intervene?
+A useful rival mechanism in the V2 proposal is that a best-K rule can lower portfolio size while **funneling researchers toward safe questions**, thereby reducing exploration. We should not treat "fewer projects" as unconditionally better.
 
-**Question.** When generation scales faster than review capacity, is it more effective to filter harder downstream or to change incentives upstream?
+**Measurement warning:** 100 points are required by the prompt. Average budget/project is therefore algebraically `100/n`. It cannot independently establish that more checking occurred, nor does it establish more reliable science.
 
-**Manipulations.** Reviewer capacity; desk threshold; editor-signal noise; resubmission probability; upstream evaluation rule.
+**Possible counterexamples:** best-K leaves project selection unchanged, produces greater convergence, or reduces scrutiny of nonselected but scientifically valuable directions.
 
-**Primary outcomes.** Manuscript traffic; desk rejection; external-review load; repeated submissions; accepted-output quality; delay.
+## 3. Is stronger desk rejection preferable to upstream reform?
 
-**Evidence against the mechanism.** If upstream evaluation changes manuscript traffic only trivially while downstream screening absorbs the shock without meaningful displacement, the proposed upstream-downstream substitution is weak.
+**Treatment:** reviewer capacity, desk threshold, noisy screening, resubmission probabilities, upstream publication rewards, and verification requirements.
 
-## Validation strategy
+**Outcomes:** primary projects and total submission attempts, editor/reviewer load, false negatives, resubmission displacement, and decision delay.
 
-- Replicate across multiple open-weight model families and prompt variants.
-- Treat model family as a design factor rather than nuisance infrastructure.
-- Use lexical, embedding, cluster, and blinded human ratings for idea similarity.
-- Pre-specify primary outcomes and null/falsification patterns before the main grid runs.
-- Release raw prompts, responses, parsed traces, and analysis code where provider terms permit.
+The stylized publication queue is currently **coded as inspectable rules**; genuine LLM editor and reviewer roles are a future extension.
+
+**Possible counterexample:** higher desk-rejection thresholds protect scarce reviewers at low total social cost, with negligible resubmission displacement.
+
+## Cross-cutting safeguards
+
+- Compare actual model families and prompt variants. Preserve negative results.
+- Pre-register measurement choices for the main study before interpreting semantic convergence.
+- Use both embeddings and blinded human judgments to validate idea similarity and scientific distinctiveness.
+- Validate the decision protocol itself: completion, violations of best-K rewards, allocation sums, and the share of generic or malformed outputs.
+- Do not use confidential manuscripts or real peer-review material.
+- Freeze complete prompts/responses and publish enough metadata for independent reruns, subject to model licensing.
+
+The October 2026 two-family pilot demonstrates that the workflow runs and can exhibit model-specific outcomes. Its 36 trajectories are not confirmatory evidence or population estimates.
