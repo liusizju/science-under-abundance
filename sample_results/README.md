@@ -1,20 +1,14 @@
-# Sample results: engineering only
+# Generated engineering outputs (not research evidence)
 
-These files come from the deterministic mock backend and exist to verify that the pipeline runs, writes complete traces, and responds to transparent theory-harness parameters.
-
-They are **not substantive findings** about AI, scientists, or idea convergence. In particular, the mock backend does not encode an AI-induced semantic treatment effect.
-
-Regenerate them with:
+This directory is used for local outputs from the deterministic smoke test:
 
 ```bash
-python scripts/run_demo.py
+python tests/test_smoke.py
+# or: python scripts/run_demo.py
 ```
 
-Each condition writes:
+The test creates `baseline/`, `high_ai_quantity/`, and `high_ai_bestk/`, each with a `summary.json`, `projects.csv`, `traces.jsonl`, and `run_metadata.json` file.
 
-- `projects.csv`
-- `summary.json`
-- `traces.jsonl`
-- `run_metadata.json`
+The original tracked mock summaries were removed from the current branch because they were tied to an earlier implementation and could be mistaken for scientific findings. **The real two-family pilot is preserved separately** under `benchmark/stage1_quick_2026-10-22/` and its frozen snapshot.
 
-The Stage-2 scientific tests require live model backends, cross-model replication, and human validation as described in `EXPERIMENTS.md`.
+The mock backend checks software plumbing only. Portfolio and verification effects in the stylized harness are coded assumptions and should not be reported as empirical effects of AI.
