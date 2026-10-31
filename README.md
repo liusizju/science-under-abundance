@@ -1,95 +1,75 @@
 # Science Under Abundance (SUA) Lab
 
-SUA Lab is an early research prototype for a simple question: **what happens to a knowledge system when producing candidate work becomes cheap before the capacity to verify and evaluate it scales?**
+**A research instrument for varying the institutions of scientific discovery.**
 
-The scientific setting is useful because the bottleneck is visible. AI can help generate questions, code, analyses, and prose quickly, while researchers, editors, and reviewers still have finite attention. SUA Lab turns that mismatch into an experimental object. It lets researchers vary the production technology and the institutions around it in the same environment.
+Scientific ideas, code, and draft analyses can now be generated quickly. Deciding which ideas deserve attention, which results are credible, and which contributions are distinctive still takes scarce expert judgment. SUA Lab makes the rules around that judgment experimentally changeable.
 
-This is deliberately a prototype rather than a synthetic claim about how scientists behave.
+The current research application is the *Organization Science* special issue, **AI-Enabled Frontiers in Organizational Science**. This repository contains the executable prototype and its reproducibility record. The associated Stage-1 proposal (revised after Mei Yang's feedback, V2) is a separate submission document, not a finished empirical paper.
 
-## What is implemented now
+## One experiment in concrete terms
 
-The Stage-1 repository contains:
+Give two cohorts of AI-assisted researcher agents the **same synthetic knowledge base**.
 
-- LLM-backed generation of structured research ideas and verification plans;
-- transparent theory-harness rules for portfolio size, scarce verification, priority pressure, desk screening, and bounded resubmission;
-- experiment configurations for broad output incentives and best-K evaluation;
-- adapters for a deterministic plumbing test, local Ollama models, and OpenAI-compatible endpoints;
-- run-level logging of configuration, prompts, raw responses, parsed records, and derived metrics;
-- a synthetic, redistributable seed corpus;
-- smoke tests that verify the pipeline without treating mock outputs as scientific findings.
+- **Broad-output cohort:** additional publishable projects can improve the agent's evaluation.
+- **Best-two cohort:** only the two strongest completed projects count.
 
-LLM-based editor and reviewer agents, human validation, embedding-based semantic measurement, and broader cross-model benchmarking are **Stage-2 work**. A frozen two-family live-model pilot is already included at Stage 1.
+Each agent is asked, in one structured LLM response, to generate four candidate questions, choose which to pursue, allocate a fixed 100-point verification budget across those projects, and react to a possible competing submission.
 
-## Three questions for the lab
+We can then examine which ideas are pursued, not just how many were proposed. A best-two rule might discourage marginal projects; it might also encourage agents to favor safe, familiar questions. The second possibility is an **alternative hypothesis**, not a finding.
 
-1. **Abundance and convergence.** Can AI increase the number of plausible ideas while making independent search paths more correlated?
-2. **Evaluation and verification.** Does broad output-based evaluation convert AI productivity into more projects and thinner scrutiny, while best-K evaluation changes that allocation?
-3. **Where to intervene.** When manuscript generation outruns expert review, is the better response to screen harder downstream or to change incentives upstream?
+This is the key distinction in the V2 research design: **candidate idea diversity and retained idea diversity are separate outcomes**. The analysis code reports both.
 
-See [`EXPERIMENTS.md`](EXPERIMENTS.md) for planned tests and explicit falsification patterns.
+## What is implemented
 
-## Reuse the lab for another mechanism
+- A **live-model protocol** for candidate generation, portfolio selection, verification allocation, and a priority response, using editable institutional prompts in [`configs/stage1_conditions.yaml`](configs/stage1_conditions.yaml).
+- A separate **stylized theory harness** for portfolio costs, verification, and editorial congestion (`src/sua_lab/`).
+- A lightweight publication layer with noisy screening, limited review capacity, and bounded resubmission.
+- Ollama and OpenAI-compatible adapters, plus a deterministic backend for engineering checks.
+- A frozen **two-family / three-regime pilot** with raw-trace artifacts and reproducibility metadata.
 
-The intended reuse path is deliberately simple:
+The prototype **does not yet contain LLM editor/reviewer agents, human-calibrated decisions, or validated measures of scientific novelty**. Those belong to the planned research program.
 
-1. Fork the repository.
-2. Replace `data/seed_corpus.jsonl` with a new synthetic or shareable knowledge environment.
-3. Copy and edit a YAML file in `configs/` to define the institutional rule you want to vary.
-4. If your theory requires a different mechanism, replace the relevant harness function while leaving generation, logging, and measurement infrastructure unchanged.
-5. Run the same comparison across model families and preserve raw traces.
+## What the October 2026 pilot did—and did not show
 
-A scholar does not need to adopt the current portfolio, priority, or publication assumptions to use the lab.
+The first live pilot used Qwen2.5-1.5B-Instruct and SmolLM2-1.7B-Instruct: 2 models × 3 institutional regimes × 2 seeds × 3 agents = **36 trajectories**. Under the prototype parser, **34 records were structurally usable**.
 
-## Quick start: deterministic plumbing test
+Best-two evaluation was associated with smaller selected portfolios in both model families. The priority response was already near the "submit now" ceiling in the baseline, while lexical idea-overlap patterns differed across models. Neither result justifies a general claim about researchers.
 
-```bash
-python scripts/run_demo.py
-```
+**Important measurement boundary:** because agents were instructed to allocate a fixed 100-point verification budget, the average number of points per retained project is mechanically `100 / portfolio_size`. It is **not independent evidence that agents chose to verify more deeply**. The next study must measure verification *quality and content* separately.
 
-The deterministic backend is an engineering fixture. It does **not** encode an AI-induced semantic convergence effect and its outputs are not evidence for the substantive theory.
+See [`benchmark/stage1_quick_2026-10-22/`](benchmark/stage1_quick_2026-10-22/) and [`docs/RESEARCH_DESIGN_V2.md`](docs/RESEARCH_DESIGN_V2.md).
 
-## Live model mode
+## Run locally
 
-### Ollama
+**Engineering smoke test (no model required):**
 
 ```bash
-python scripts/run_experiment.py --backend ollama --model llama3.1:8b --config configs/baseline.yaml --out sample_results/ollama_baseline
+python tests/test_smoke.py
 ```
 
-### OpenAI-compatible endpoint
+**One live-model experiment using the editable institutional rules:**
 
 ```bash
-export SUA_BASE_URL="http://localhost:8000/v1"
-export SUA_API_KEY="optional"
-python scripts/run_experiment.py --backend openai-compatible --model your-model --config configs/baseline.yaml --out sample_results/compatible_baseline
+pip install -r requirements.txt
+python scripts/run_stage1_benchmark.py \
+  --base-url http://127.0.0.1:11434/v1 \
+  --model YOUR_LOCAL_MODEL \
+  --model-label your-model \
+  --conditions-file configs/stage1_conditions.yaml \
+  --n-seeds 2 --n-agents 3 \
+  --out live_runs/my_experiment
 ```
 
-### Run the configuration grid
+The server must already be running and exposing an OpenAI-compatible `/v1/chat/completions` endpoint. For the stylized theory harness instead, run `python scripts/run_demo.py`.
 
-```bash
-python scripts/run_grid.py --backend mock
-```
+## Reuse without adopting our theory
 
-For substantive experiments, replace `mock` with an accessible live backend.
+Fork the repository, replace [`data/seed_corpus.jsonl`](data/seed_corpus.jsonl), and edit [`configs/stage1_conditions.yaml`](configs/stage1_conditions.yaml) to compare a different institutional rule. The generation and trace-logging infrastructure does not require you to accept the project's workload or priority-race hypotheses.
 
-## Stage-1 live-model pilot
+The lab's most valuable output may be a counterexample: a selective evaluation rule that narrows exploration, or a priority signal that leads agents to abandon crowded topics rather than rush publication.
 
-A frozen 36-trajectory open-weight pilot has now been run with Qwen2.5-1.5B-Instruct and SmolLM2-1.7B-Instruct across three institutional regimes. The pilot produced 34 valid structured trajectories. Best-K evaluation reduced selected portfolio size in both model families; the priority-action and idea-convergence margins were mixed or uninformative at this scale. We treat that mixture as evidence that the lab can return null and model-specific patterns rather than as confirmatory evidence.
-
-See [`benchmark/stage1_quick_2026-10-22/`](benchmark/stage1_quick_2026-10-22/) for the frozen design, descriptive summary, workflow identifiers, and artifact digests. Raw prompts and responses are preserved in the GitHub Actions artifacts and the submission snapshot.
-
-## Reproducibility
-
-Each run writes the complete configuration, random seed, prompt, raw model response, parsed record, and summary metrics. See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md).
-
-## Boundaries
-
-LLM agents are computational probes, not estimates of human behavior. A failed replication across models or a mismatch with human judgments is scientifically informative. See [`BOUNDARIES.md`](BOUNDARIES.md).
-
-## Stage-1 proposal
-
-Prepared for the *Organization Science* special issue **AI-Enabled Frontiers in Organizational Science**.
+[Experiments and falsification](EXPERIMENTS.md) · [Reproducibility](REPRODUCIBILITY.md) · [Boundaries](BOUNDARIES.md) · [Artifact manifest](ARTIFACT_MANIFEST.md)
 
 ## License
 
-Code: MIT License. Synthetic seed corpus and documentation: CC BY 4.0.
+Code is MIT licensed. The synthetic seed corpus and documentation are intended for reuse under CC BY 4.0.
