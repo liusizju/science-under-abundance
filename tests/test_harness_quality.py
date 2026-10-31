@@ -76,6 +76,69 @@ class BenchmarkTests(unittest.TestCase):
         self.assertIn("allocation_sum_not_100", decision["protocol_warnings"])
         self.assertAlmostEqual(sum(decision["allocations"].values()), 100)
 
+    def test_prompt_example_is_valid_json(self):
+        conditions = self.runner.load_conditions(
+            ROOT / "configs" / "stage1_conditions.yaml"
+        )
+        prompt = self.runner.build_prompt(
+            [{"text": "Synthetic research topics."}], conditions["quantity"]
+        )
+        example = prompt.split("Return JSON ONLY with this schema:", 1)[1]
+        data = json.loads(example)
+        self.assertEqual(len(data["ideas"]), 4)
+
+    def test_nonfinite_allocation_is_flagged(self):
+        record = {
+            "ideas": [
+                {"id": i, "question": f"Question {i}"}
+                for i in range(1, 5)
+            ],
+            "selected_ids": [1],
+            "verification": {"1": "NaN"},
+            "priority_response": {"action": "submit_now"},
+        }
+        result = self.runner.normalize(record)
+        self.assertIsNotNone(result)
+        self.assertIn("invalid_allocation", result["protocol_warnings"])
+
+    def test_completely_invalid_cells_remain_in_report(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            out = Path(temporary)
+            trace_path = out / "raw.jsonl"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "model_label": "tiny-model",
+                        "condition": "quantity",
+                        "normalized": None,
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            report = out / "report"
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "scripts" / "analyze_stage1_benchmark.py"),
+                    str(trace_path),
+                    "--out",
+                    str(report),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            summary = json.loads(
+                (report / "benchmark_summary.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(summary["summaries"], [])
+            self.assertEqual(
+                summary["completion_by_cell"][0]["invalid"], 1
+            )
+
     def test_malformed_records_are_not_counted_as_valid(self):
         self.assertIsNone(self.runner.normalize(None))
         self.assertIsNone(self.runner.normalize({"ideas": [], "selected_ids": []}))
