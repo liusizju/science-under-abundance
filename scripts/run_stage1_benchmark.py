@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import time
 from pathlib import Path
@@ -68,7 +69,12 @@ Complete all four tasks:
 
 Return JSON ONLY with this schema:
 {{
-  "ideas": [{{"id":1,"title":"...","question":"...","mechanism":"..."}}, ... exactly 4],
+  "ideas": [
+    {{"id":1,"title":"...","question":"...","mechanism":"..."}},
+    {{"id":2,"title":"...","question":"...","mechanism":"..."}},
+    {{"id":3,"title":"...","question":"...","mechanism":"..."}},
+    {{"id":4,"title":"...","question":"...","mechanism":"..."}}
+  ],
   "selected_ids": [1,2],
   "verification": {{"1":60,"2":40}},
   "priority_response": {{"focal_id":1,"action":"submit_now","reason":"...","revised_verification":45}}
@@ -84,7 +90,7 @@ def call_model(
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.35,
         "seed": seed,
-        "max_tokens": 650,
+        "max_tokens": 1024,
         "response_format": {"type": "json_object"},
     }
     request = Request(
@@ -154,9 +160,13 @@ def normalize(record: dict | None) -> dict | None:
     for idea_id in selected_ids:
         try:
             amount = float(allocations.get(str(idea_id), allocations.get(idea_id, 0)))
+            if not math.isfinite(amount):
+                raise ValueError("Non-finite allocation")
         except (TypeError, ValueError):
             warnings.append("invalid_allocation")
             amount = 0.0
+        if amount < 0:
+            warnings.append("negative_allocation")
         amounts.append(max(0.0, amount))
 
     reported_total = sum(amounts)
@@ -177,6 +187,8 @@ def normalize(record: dict | None) -> dict | None:
 
     try:
         revised = float(priority.get("revised_verification", 0))
+        if not math.isfinite(revised):
+            raise ValueError("Non-finite revised allocation")
     except (TypeError, ValueError):
         revised = 0.0
         warnings.append("invalid_revised_verification")
