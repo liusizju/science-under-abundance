@@ -193,7 +193,6 @@ def institutional_contrasts(summaries: list[dict]) -> list[dict]:
     return contrasts
 
 
-
 def completion_by_cell(records: list[dict]) -> list[dict]:
     """Keep cells visible even when every model response is unusable."""
     groups = defaultdict(list)
@@ -238,7 +237,7 @@ def write_report(output: Path, records: list[dict], results: dict) -> None:
         "",
         "| Model | Condition | Valid | Portfolio | Points/project | Candidate overlap | Selected overlap | Submit now |",
         "|---|---|---:|---:|---:|---:|---:|---:|",
-    ]
+    ])
     for row in summaries:
         lines.append(
             f"| {row['model']} | {row['condition']} | {row['n']} "
