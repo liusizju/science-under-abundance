@@ -1,20 +1,34 @@
-# What SUA Lab can and cannot establish
+# Interpretation boundaries
 
-SUA Lab is a theory-building research instrument. It is not a synthetic substitute for field evidence about scientists.
+SUA Lab makes **organizational rules around knowledge production experimentally manipulable**. It does not turn simulated LLM trajectories into evidence about real scientists.
 
-## The artifact can help with
+## Claims supported at Stage 1
 
-- exposing system-level feedback that is difficult to isolate in archival data;
-- comparing institutional rules inside the same controlled environment;
-- discovering mechanisms that were not encoded as scalar state variables;
-- identifying boundary conditions and surprising failures of analytical predictions;
-- generating testable hypotheses for human or archival research.
+- The prototype can generate open-ended research objects, select portfolios, allocate a stated budget, and respond to a priority prompt using different open-weight model families.
+- The implementation can vary evaluation rules around the same synthetic corpus, preserve raw traces, and analyze model-specific responses.
+- A preliminary 36-trajectory run exhibited smaller selected portfolios under best-two evaluation in both model families. Other patterns were ambiguous or at ceiling.
 
-## The artifact cannot, by itself, establish
+## Claims NOT established
 
-- causal effects on human researchers;
-- calibrated optimal tenure, promotion, or journal policies;
-- population estimates of misconduct or verification behavior;
-- that any one language model is representative of researchers or reviewers.
+- That real researchers increase total workload when AI improves;
+- that human verification quality improves under best-K;
+- that language similarity reliably measures scientific idea duplication;
+- that AI creates universally greater idea convergence or priority pressure;
+- that modeled desks and reviewers faithfully represent real editorial decisions;
+- that a particular tenure, promotion, or journal policy is socially optimal.
 
-A useful Stage-2 outcome may therefore be a negative one: the synthetic system may fail to reproduce a theoretical mechanism or may reveal that results are highly model-specific. Those failures are part of the scientific contribution, not defects to be hidden.
+## A mechanical versus behavioral distinction
+
+When a participant must allocate exactly 100 points, `verification_per_project = 100/portfolio_size`. This number *must* rise as selected portfolio size falls, regardless of whether the agent is conscientious. Its direction cannot be counted as separate support for verification quality.
+
+For the substantive claim we need content-based evaluation of how verification effort is *allocated and described*, and eventually blinded human ratings.
+
+## Competing theoretical explanation
+
+Best-two rewards might reduce marginal projects but also encourage a concentration on familiar, easily defended research. In that event fewer projects and greater attention per project could accompany **less intellectual exploration**. This is a motivating possibility from the revised Stage-1 proposal, not a finding already demonstrated.
+
+## Why negative results matter
+
+A model-specific effect, a failed human replication, or a prompt-induced reversal reveals where synthetic experimentation stops being informative. These are useful limits for a generalizable AI-enabled research instrument.
+
+The synthetic seed corpus is designed for reuse. Never upload confidential manuscripts, reviewer reports, proposals, personal conversations, or unpublished ideas belonging to others into experiments without explicit appropriate authorization.
